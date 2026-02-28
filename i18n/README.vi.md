@@ -1,6 +1,7 @@
 [English](../README.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [中文 (简体)](README.zh-Hans.md) · [中文（繁體）](README.zh-Hant.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
 
+
 [![LazyingArt banner](https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png)](https://github.com/lachlanchen/lachlanchen/blob/main/figs/banner.png)
 
 
@@ -14,73 +15,90 @@
 ![Legacy Scripts](https://img.shields.io/badge/Legacy%20Scripts-Present-orange)
 ![i18n](https://img.shields.io/badge/i18n-Enabled-brightgreen)
 ![Maintained Path](https://img.shields.io/badge/Video-v2c.py-2ea44f)
+![Contributions](https://img.shields.io/badge/Contributions-Welcome-2ea44f?style=flat-square)
+![Issues](https://img.shields.io/github/issues-raw/lachlanchen/VideoCaptionerWithClip?style=flat-square)
+![Last Commit](https://img.shields.io/github/last-commit/lachlanchen/VideoCaptionerWithClip?style=flat-square)
 
-Bộ công cụ Python để tạo chú thích ngôn ngữ tự nhiên cho hình ảnh và video bằng cách kết hợp embeddings thị giác của OpenAI CLIP với mô hình ngôn ngữ kiểu GPT.
+---
+
+## 🧭 Quick Navigation
+
+| Mục | Dùng để |
+|---|---|
+| Snapshot | Xem phạm vi repo và danh mục script hiện tại |
+| Overview | Đọc mục tiêu và phạm vi năng lực |
+| Usage | Thực hiện đúng các quy trình CLI/API |
+| Troubleshooting | Khắc phục nhanh các lỗi chạy thường gặp |
+| Roadmap | Theo dõi các mục tối ưu/sửa lỗi đã biết |
+
+---
+
+Bộ công cụ Python sinh mô tả ngôn ngữ tự nhiên cho ảnh và video bằng cách kết hợp embedding hình ảnh từ OpenAI CLIP với mô hình ngôn ngữ kiểu GPT.
 
 ## 🧭 Snapshot
 
-| Kích thước | Chi tiết |
+| Phạm vi | Chi tiết |
 |---|---|
-| Phạm vi nhiệm vụ | Chú thích ảnh và video |
-| Kết quả chính | Phụ đề SRT, transcript JSON, ảnh có chú thích |
+| Phạm vi tác vụ | Sinh caption cho ảnh và video |
+| Kết quả chính | Subtitle SRT, transcript JSON, ảnh đã gắn caption |
 | Script chính | `i2c.py`, `v2c.py`, `image2caption.py` |
-| Đường dẫn legacy | `video2caption.py` và các phiên bản phiên bản hoá (giữ lại cho mục đích tham khảo) |
-| Luồng dữ liệu dataset | `data/raw/results.csv` + `data/raw/flickr30k_images/` |
+| Đường đi legacy | `video2caption.py` và các phiên bản liên quan (giữ để tham chiếu lịch sử) |
+| Luồng dữ liệu | `data/raw/results.csv` + `data/raw/flickr30k_images/` |
 
 ## ✨ Tổng quan
 
-Repository này cung cấp:
+Repo này cung cấp:
 
-- Script suy luận cho việc tạo caption ảnh và phụ đề video.
-- Pipeline huấn luyện học ánh xạ từ embeddings thị giác CLIP sang token embeddings của GPT-2.
-- Tiện ích tạo dataset theo kiểu Flickr30k.
-- Tự động tải checkpoint của các kích thước model được hỗ trợ khi thiếu trọng số.
-- Các phiên bản README đa ngôn ngữ trong `i18n/` (xem thanh ngôn ngữ ở trên).
+- Script suy luận cho caption ảnh và sinh phụ đề video.
+- Pipeline huấn luyện ánh xạ embedding ảnh CLIP sang embedding token của GPT-2.
+- Tiện ích tạo bộ dữ liệu theo phong cách Flickr30k.
+- Tự động tải checkpoint theo kích thước mô hình khi thiếu file trọng số.
+- Các bản README đa ngôn ngữ trong `i18n/` (xem thanh ngôn ngữ phía trên).
 
-Triển khai hiện tại bao gồm cả script mới và script legacy. Một số file legacy được giữ lại để tham khảo và được mô tả bên dưới.
+Triển khai hiện tại có cả script mới và script kế thừa. Một số file cũ được giữ lại để tham khảo và được mô tả bên dưới.
 
 ## 🚀 Tính năng
 
-- Chú thích ảnh đơn qua `image2caption.py`.
-- Chú thích video (lấy mẫu frame đồng đều) qua `v2c.py` hoặc `video2caption.py`.
-- Tùy chỉnh tuỳ chọn chạy:
-  - Số lượng frame.
-  - Kích thước model.
-  - Nhiệt độ sampling.
+- Sinh caption cho ảnh đơn qua `image2caption.py`.
+- Sinh caption video (lấy mẫu frame đều nhau) qua `v2c.py` hoặc `video2caption.py`.
+- Tùy chỉnh thời gian chạy:
+  - Số frame.
+  - Kích thước mô hình.
+  - Nhiệt độ lấy mẫu.
   - Tên checkpoint.
-- Suy luận video song song/multi-thread để nhanh hơn.
-- Tệp đầu ra:
-  - Tệp phụ đề SRT (`.srt`).
+- Song song/multi-process để suy luận video nhanh hơn.
+- Đầu ra:
+  - File subtitle SRT (`.srt`).
   - Transcript JSON (`.json`) trong `v2c.py`.
-- Điểm vào huấn luyện và đánh giá cho thí nghiệm ánh xạ CLIP+GPT2.
+- Điểm khởi đầu huấn luyện và đánh giá cho thử nghiệm ánh xạ CLIP+GPT2.
 
 ### Tóm tắt nhanh
 
-| Mục | Script chính | Ghi chú |
+| Khu vực | Script chính | Ghi chú |
 |---|---|---|
-| Chú thích ảnh | `image2caption.py`, `i2c.py`, `predict.py` | CLI + lớp dùng lại được |
-| Chú thích video | `v2c.py` | Đường dẫn được duy trì, khuyến nghị |
-| Dòng video legacy | `video2caption.py`, `video2caption_v1.1.py` | Chứa giả định phụ thuộc máy |
-| Tạo dataset | `dataset_generation.py` | Tạo ra `data/processed/dataset.pkl` |
-| Huấn luyện / đánh giá | `training.py`, `evaluate.py` | Dùng ánh xạ CLIP+GPT2 |
+| Caption ảnh | `image2caption.py`, `i2c.py`, `predict.py` | Có cả CLI và class có thể tái sử dụng |
+| Caption video | `v2c.py` | Đường dẫn đang được duy trì khuyến nghị |
+| Luồng kế thừa video | `video2caption.py`, `video2caption_v1.1.py` | Chứa giả định riêng cho máy cụ thể |
+| Tạo dataset | `dataset_generation.py` | Tạo `data/processed/dataset.pkl` |
+| Train / eval | `training.py`, `evaluate.py` | Dùng ánh xạ CLIP+GPT2 |
 
-## 🧱 Kiến trúc (Mức tổng quan)
+## 🧱 Kiến trúc (Tổng quan)
 
 Mô hình lõi trong `model/model.py` gồm ba phần:
 
-1. `ImageEncoder`: trích xuất embedding hình ảnh CLIP.
-2. `Mapping`: biến đổi embedding CLIP thành một chuỗi embedding tiền tố của GPT.
-3. `TextDecoder`: phần GPT-2 tự hồi quy sinh token caption.
+1. `ImageEncoder`: trích xuất embedding ảnh từ CLIP.
+2. `Mapping`: chiếu embedding CLIP thành dãy embedding tiền tố cho GPT.
+3. `TextDecoder`: head mô hình GPT-2 sinh token caption theo autoregressive.
 
-Huấn luyện (`Net.train_forward`) dùng embeddings hình ảnh CLIP đã được tính trước cộng với caption đã tokenize.
-Suy luận (`Net.forward`) dùng ảnh PIL và giải mã token cho đến khi gặp EOS hoặc `max_len`.
+Huấn luyện (`Net.train_forward`) dùng trước embedding ảnh CLIP đã tiền xử lý + caption đã tokenize.
+Suy luận (`Net.forward`) nhận ảnh PIL và giải mã token đến khi gặp EOS hoặc `max_len`.
 
 ### Luồng dữ liệu
 
-1. Chuẩn bị dataset: `dataset_generation.py` đọc `data/raw/results.csv` và ảnh trong `data/raw/flickr30k_images/`, ghi `data/processed/dataset.pkl`.
-2. Huấn luyện: `training.py` nạp tuple pickle `(image_name, image_embedding, caption)` rồi huấn luyện các lớp mapper/decoder.
-3. Đánh giá: `evaluate.py` render caption sinh ra trên ảnh test đã tách ra.
-4. Cung cấp suy luận:
+1. Chuẩn bị dataset: `dataset_generation.py` đọc `data/raw/results.csv` và ảnh trong `data/raw/flickr30k_images/`, ghi ra `data/processed/dataset.pkl`.
+2. Huấn luyện: `training.py` đọc tuple pickle `(image_name, image_embedding, caption)` và huấn luyện các lớp mapper/decoder.
+3. Đánh giá: `evaluate.py` render caption sinh ra lên tập ảnh test.
+4. Thực thi suy luận:
    - ảnh: `image2caption.py` / `predict.py` / `i2c.py`.
    - video: `v2c.py` (khuyến nghị), `video2caption.py` (legacy).
 
@@ -89,44 +107,44 @@ Suy luận (`Net.forward`) dùng ảnh PIL và giải mã token cho đến khi g
 ```text
 VideoCaptionerWithClip/
 ├── README.md
-├── image2caption.py               # CLI caption ảnh đơn
-├── predict.py                     # CLI caption ảnh đơn thay thế
-├── i2c.py                         # Lớp ImageCaptioner dùng lại được + CLI
-├── v2c.py                         # Video -> SRT + JSON (caption frame theo đa luồng)
-├── video2caption.py               # Triển khai thay thế video -> SRT (ràng buộc legacy)
-├── video2caption_v1.1.py          # Biến thể cũ hơn
-├── video2caption_v1.0_not_work.py # File legacy được ghi rõ là không hoạt động
-├── training.py                    # Điểm vào huấn luyện mô hình
-├── evaluate.py                    # Đánh giá tập test và đầu ra đã render
-├── dataset_generation.py          # Tạo data/processed/dataset.pkl
+├── image2caption.py               # Single-image caption CLI
+├── predict.py                     # Alternate single-image caption CLI
+├── i2c.py                         # Reusable ImageCaptioner class + CLI
+├── v2c.py                         # Video -> SRT + JSON (threaded frame captioning)
+├── video2caption.py               # Alternate video -> SRT implementation (legacy constraints)
+├── video2caption_v1.1.py          # Older variant
+├── video2caption_v1.0_not_work.py # Explicitly marked non-working legacy file
+├── training.py                    # Model training entrypoint
+├── evaluate.py                    # Test-split evaluation and rendered outputs
+├── dataset_generation.py          # Builds data/processed/dataset.pkl
 ├── data/
 │   ├── __init__.py
 │   └── dataset.py                 # Dataset + DataLoader helpers
 ├── model/
 │   ├── __init__.py
 │   ├── model.py                   # CLIP encoder + mapping + GPT2 decoder
-│   └── trainer.py                 # Lớp tiện ích train/validation/test
+│   └── trainer.py                 # Training/validation/test utility class
 ├── utils/
 │   ├── __init__.py
-│   ├── config.py                  # Mặc định ConfigS / ConfigL
-│   ├── downloads.py               # Trình tải checkpoint Google Drive
-│   └── lr_warmup.py               # Lịch trình LR warmup
-├── i18n/                          # Các phiên bản README đa ngôn ngữ
-└── .auto-readme-work/             # Tài sản/artefact của pipeline auto-readme
+│   ├── config.py                  # ConfigS / ConfigL defaults
+│   ├── downloads.py               # Google Drive checkpoint downloader
+│   └── lr_warmup.py               # LR warmup schedule
+├── i18n/                          # Multilingual README variants
+└── .auto-readme-work/             # Auto-README pipeline artifacts
 ```
 
-## 📋 Yêu cầu tiên quyết
+## 📋 Yêu cầu
 
-- Python `3.10+` được khuyến nghị.
-- GPU hỗ trợ CUDA không bắt buộc nhưng được khuyến nghị mạnh cho huấn luyện và suy luận model lớn.
-- `ffmpeg` không bắt buộc trực tiếp bởi các script hiện tại (OpenCV được dùng để trích frame).
-- Cần kết nối internet lần đầu để tải model/checkpoint từ Hugging Face / Google Drive.
+- Khuyến nghị dùng Python `3.10+`.
+- GPU có hỗ trợ CUDA là không bắt buộc nhưng rất khuyến nghị cho huấn luyện và suy luận mô hình lớn.
+- `ffmpeg` không bắt buộc trực tiếp cho các script hiện tại (OpenCV được dùng để trích frame).
+- Cần có truy cập Internet cho lần tải đầu tiên mô hình/checkpoint từ Hugging Face hoặc Google Drive.
 
-Hiện chưa có lockfile (`requirements.txt` / `pyproject.toml` vắng mặt), nên dependency được suy ra từ các `import`.
+Hiện chưa có lockfile (`requirements.txt` / `pyproject.toml` chưa có), nên phụ thuộc được suy ra từ import trong mã nguồn.
 
 ## 🛠️ Cài đặt
 
-### Thiết lập chuẩn theo cấu trúc repository hiện tại
+### Cài đặt chuẩn theo cấu trúc repo hiện tại
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
@@ -140,40 +158,40 @@ pip install torch torchvision torchaudio
 pip install transformers pillow matplotlib numpy tqdm opencv-python pandas wandb gdown
 ```
 
-### Đoạn cài đặt từ README gốc (được giữ nguyên)
+### Snippet cài đặt từ README cũ (được giữ nguyên)
 
-README trước đó kết thúc giữa chừng trong một block. Các lệnh gốc giữ nguyên như nội dung lịch sử nguồn sau đây:
+README trước kết thúc giữa khối lệnh. Các lệnh gốc được giữ đúng như nguồn lịch sử bên dưới:
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
 cd VideoCaptionerWithClip/src
 ```
 
-Lưu ý: snapshot repository hiện tại đặt script ở root repo, không nằm trong `src/`.
+Lưu ý: snapshot hiện tại đặt tất cả script ở root repo, không nằm trong `src/`.
 
 ## ▶️ Bắt đầu nhanh
 
 | Mục tiêu | Lệnh |
 |---|---|
-| Chú thích ảnh | `python image2caption.py -I /path/to/image.jpg -S L -C model.pt` |
-| Chú thích video | `python v2c.py -V /path/to/video.mp4 -N 10` |
+| Caption một ảnh | `python image2caption.py -I /path/to/image.jpg -S L -C model.pt` |
+| Caption một video | `python v2c.py -V /path/to/video.mp4 -N 10` |
 | Tạo dataset | `python dataset_generation.py` |
 
-### Chú thích ảnh (chạy nhanh)
+### Caption ảnh (chạy nhanh)
 
 ```bash
 python image2caption.py -I /path/to/image.jpg -S L -C model.pt
 ```
 
-### Chú thích video (đường dẫn khuyến nghị)
+### Caption video (đường dẫn khuyến nghị)
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
 ```
 
-## 🎯 Cách sử dụng
+## 🎯 Hướng dẫn sử dụng
 
-### 1. Chú thích ảnh (`image2caption.py`)
+### 1. Caption ảnh (`image2caption.py`)
 
 ```bash
 python image2caption.py \
@@ -184,13 +202,13 @@ python image2caption.py \
   -T 1.0
 ```
 
-Tham số:
+Đối số:
 
 - `-I, --img-path`: đường dẫn ảnh đầu vào.
-- `-S, --size`: kích thước model (`S` hoặc `L`).
-- `-C, --checkpoint-name`: tên checkpoint trong `weights/{small|large}`.
-- `-R, --res-path`: thư mục đầu ra cho ảnh đã render caption.
-- `-T, --temperature`: nhiệt độ sampling.
+- `-S, --size`: kích thước mô hình (`S` hoặc `L`).
+- `-C, --checkpoint-name`: tên file checkpoint trong `weights/{small|large}`.
+- `-R, --res-path`: thư mục output cho ảnh đã render caption.
+- `-T, --temperature`: tham số nhiệt độ sampling.
 
 ### 2. CLI ảnh thay thế (`predict.py`)
 
@@ -203,15 +221,15 @@ python predict.py \
   -T 1.0
 ```
 
-`predict.py` về chức năng tương tự `image2caption.py`; định dạng văn bản đầu ra có chênh lệch nhẹ.
+`predict.py` hoạt động tương tự `image2caption.py`; chỉ khác một chút phần format đầu ra.
 
-### 3. API lớp chú thích ảnh (`i2c.py`)
+### 3. API class caption ảnh (`i2c.py`)
 
 ```bash
 python i2c.py -I /path/to/image.jpg -S L -C model.pt -R ./data/result/prediction -T 1.0
 ```
 
-Hoặc import trong script riêng của bạn:
+Hoặc import trong script riêng:
 
 ```python
 from i2c import ImageCaptioner
@@ -222,34 +240,34 @@ caption = captioner.generate_caption(save_image=True)
 print(caption)
 ```
 
-### 4. Video thành phụ đề + JSON (`v2c.py`)
+### 4. Caption video thành subtitle + JSON (`v2c.py`)
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
 ```
 
-Đầu ra nằm cạnh video đầu vào:
+Kết quả xuất ra cạnh file video gốc:
 
 - `<video_basename>_caption.srt`
 - `<video_basename>_caption.json`
 - `<video_basename>_captioning_frames/`
 
-### 5. Pipeline video thay thế (`video2caption.py`)
+### 5. Pipeline thay thế (`video2caption.py`)
 
 ```bash
 python video2caption.py -V /path/to/video.mp4 -N 10
 ```
 
-Quan trọng: script hiện tại vẫn chứa các đường dẫn hardcoded phụ thuộc máy:
+Lưu ý quan trọng: script này hiện còn chứa một số đường dẫn cứng theo máy cụ thể:
 
-- Python path mặc định: `/home/lachlan/miniconda3/envs/caption/bin/python`
-- Đường dẫn script caption: `/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
+- Python mặc định: `/home/lachlan/miniconda3/envs/caption/bin/python`
+- Đường dẫn caption script: `/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
 
-Hãy dùng `v2c.py` trừ khi bạn cố tình duy trì các đường dẫn này.
+Nên dùng `v2c.py` nếu bạn không có nhu cầu duy trì cố định các đường dẫn trên.
 
-### 6. Biến thể legacy (`video2caption_v1.1.py`)
+### 6. Phiên bản legacy (`video2caption_v1.1.py`)
 
-Script này được giữ lại để tham chiếu lịch sử. Với dùng thực tế, ưu tiên `v2c.py`.
+Script này được giữ lại để tham chiếu lịch sử. Với sử dụng hằng ngày nên chọn `v2c.py`.
 
 ### 7. Tạo dataset
 
@@ -257,10 +275,10 @@ Script này được giữ lại để tham chiếu lịch sử. Với dùng th�
 python dataset_generation.py
 ```
 
-Đầu vào thô dự kiến:
+Đầu vào thô mong đợi:
 
-- `data/raw/results.csv` (bảng caption phân tách bằng dấu `|`).
-- `data/raw/flickr30k_images/` (các file ảnh được CSV tham chiếu).
+- `data/raw/results.csv` (bảng caption phân tách bằng pipe).
+- `data/raw/flickr30k_images/` (các file ảnh được tham chiếu trong CSV).
 
 Đầu ra:
 
@@ -272,7 +290,7 @@ python dataset_generation.py
 python training.py -S L -C model.pt
 ```
 
-Huấn luyện mặc định dùng logging của Weights & Biases (`wandb`).
+Huấn luyện mặc định log bằng Weights & Biases (`wandb`).
 
 ### 9. Đánh giá
 
@@ -285,20 +303,20 @@ python evaluate.py \
   -T 1.0
 ```
 
-Đánh giá render caption dự đoán lên ảnh test và lưu tại:
+Kết quả đánh giá render caption lên ảnh test và lưu tại:
 
 - `<res-path>/<checkpoint_name_without_ext>_<SIZE>/`
 
 ## ⚙️ Cấu hình
 
-Cấu hình mô hình được định nghĩa trong `utils/config.py`:
+Các cấu hình mô hình nằm trong `utils/config.py`:
 
-| Config | CLIP backbone | GPT model | Weights dir |
+| Cấu hình | CLIP backbone | Mô hình GPT | Thư mục weights |
 |---|---|---|---|
 | `ConfigS` | `openai/clip-vit-base-patch32` | `gpt2` | `weights/small` |
 | `ConfigL` | `openai/clip-vit-large-patch14` | `gpt2-medium` | `weights/large` |
 
-Giá trị mặc định từ các lớp cấu hình:
+Các tham số mặc định:
 
 | Trường | `ConfigS` | `ConfigL` |
 |---|---:|---:|
@@ -308,27 +326,27 @@ Giá trị mặc định từ các lớp cấu hình:
 | `ep_len` | 4 | 4 |
 | `max_len` | 40 | 40 |
 
-ID tự động tải checkpoint nằm trong `utils/downloads.py`:
+ID checkpoint tự động tải được lưu trong `utils/downloads.py`:
 
 | Kích thước | Google Drive ID |
 |---|---|
 | `L` | `1Gh32arzhW06C1ZJyzcJSSfdJDi3RgWoG` |
 | `S` | `1pSQruQyg8KJq6VmzhMLFbT_VaHJMdlWF` |
 
-## 📦 Tệp đầu ra
+## 📦 File đầu ra
 
 ### Suy luận ảnh
 
-- Ảnh có caption chồng/nội dung đè lên được lưu tại `--res-path`.
+- Ảnh kết quả với chữ caption overlay được lưu tại `--res-path`.
 - Mẫu tên file: `<input_stem>-R<SIZE>.jpg`.
 
 ### Suy luận video (`v2c.py`)
 
 - SRT: `<video_stem>_caption.srt`
 - JSON: `<video_stem>_caption.json`
-- Frame ảnh: `<video_stem>_captioning_frames/`
+- Ảnh frame: `<video_stem>_captioning_frames/`
 
-Ví dụ một phần tử JSON:
+Ví dụ phần tử JSON:
 
 ```json
 {
@@ -341,30 +359,30 @@ Ví dụ một phần tử JSON:
 
 ## 🧪 Ví dụ
 
-### Ví dụ nhanh cho chú thích ảnh
+### Ví dụ caption ảnh nhanh
 
 ```bash
 python image2caption.py -I ./examples/dog.jpg -S S -C model.pt
 ```
 
-Hành vi dự kiến:
+Hành vi mong đợi:
 
-- Nếu thiếu `weights/small/model.pt`, file sẽ được tải về.
-- Mặc định một ảnh có caption được ghi vào `./data/result/prediction`.
-- Văn bản caption được in ra stdout.
+- Nếu `weights/small/model.pt` chưa có, nó sẽ tự tải.
+- Mặc định sẽ tạo ảnh có caption trong `./data/result/prediction`.
+- Text caption được in ra stdout.
 
-### Ví dụ nhanh cho chú thích video
+### Ví dụ caption video nhanh
 
 ```bash
 python v2c.py -V ./examples/demo.mp4 -N 8
 ```
 
-Hành vi dự kiến:
+Hành vi mong đợi:
 
-- 8 frame được lấy mẫu đồng đều để tạo caption.
-- Tệp `.srt` và `.json` được tạo bên cạnh video đầu vào.
+- 8 frame được lấy mẫu đều và được caption.
+- File `.srt` và `.json` sẽ sinh cạnh video đầu vào.
 
-### Chuỗi huấn luyện/đánh giá end-to-end
+### Chuỗi huấn luyện + đánh giá end-to-end
 
 ```bash
 python dataset_generation.py
@@ -374,52 +392,52 @@ python evaluate.py -I ./data/raw/flickr30k_images -R ./data/result/eval -S L -C 
 
 ## 🧭 Ghi chú phát triển
 
-- Có phần chồng lặp legacy giữa `v2c.py`, `video2caption.py`, và `video2caption_v1.*`.
-- `video2caption_v1.0_not_work.py` được giữ lại có chủ đích như mã legacy không hoạt động.
-- `training.py` hiện chọn `ConfigL()` qua `config = ConfigL() if args.size.upper() else ConfigS()`, luôn giải quyết về `ConfigL` cho mọi `--size` không rỗng.
-- `model/trainer.py` dùng `self.dataset` trong `test_step`, trong khi hàm khởi tạo gán `self.test_dataset`; điều này có thể làm hỏng sampling trong các lần chạy huấn luyện nếu chưa chỉnh sửa.
-- `video2caption_v1.1.py` tham chiếu `self.config.transform`, nhưng `ConfigS`/`ConfigL` không định nghĩa `transform`.
-- Tạm thời chưa có CI/test suite trong snapshot repository hiện tại.
-- Ghi chú i18n: các liên kết ngôn ngữ đã có ở đầu README; có thể bổ sung thêm bản dịch khác trong `i18n/`.
-- Ghi chú trạng thái hiện tại: thanh ngôn ngữ liên kết đến `i18n/README.ru.md`, nhưng file này chưa có trong snapshot.
+- `v2c.py`, `video2caption.py`, và `video2caption_v1.*` có phần chức năng lặp lại.
+- `video2caption_v1.0_not_work.py` được giữ có chủ đích như legacy không còn dùng.
+- `training.py` hiện đang chọn `ConfigL()` qua `config = ConfigL() if args.size.upper() else ConfigS()`, nên gần như luôn trả về `ConfigL` khi `--size` không rỗng.
+- `model/trainer.py` dùng `self.dataset` trong `test_step`, trong khi initializer lại gán `self.test_dataset`; điểm này có thể làm lỗi lấy mẫu trong một số lần train nếu không chỉnh.
+- `video2caption_v1.1.py` tham chiếu `self.config.transform`, nhưng `ConfigS`/`ConfigL` không có trường `transform`.
+- Repo hiện chưa có CI/test suite.
+- Ghi chú i18n: thanh ngôn ngữ nằm đầu README; các file dịch có thể được thêm vào `i18n/`.
+- Hiện trạng: thanh ngôn ngữ có liên kết `i18n/README.ru.md`, nhưng file này chưa có trong snapshot này.
 
-## 🩺 Xử lý sự cố
+## 🩺 Khắc phục sự cố
 
 - `AssertionError: Image does not exist`
-  - Kiểm tra `-I/--img-path` trỏ đến một file hợp lệ.
+  - Kiểm tra `-I/--img-path` trỏ tới một file hợp lệ.
 - `Dataset file not found. Downloading...`
-  - `MiniFlickrDataset` nêu lỗi này khi `data/processed/dataset.pkl` chưa có; chạy `python dataset_generation.py` trước.
+  - `MiniFlickrDataset` phát ra lỗi khi thiếu `data/processed/dataset.pkl`; hãy chạy `python dataset_generation.py` trước.
 - `Path to the test image folder does not exist`
-  - Kiểm tra `evaluate.py -I` trỏ đến folder hiện có.
-- Chạy lần đầu chậm hoặc lỗi
-  - Lần chạy đầu sẽ tải model từ Hugging Face và có thể tải checkpoint từ Google Drive.
+  - Kiểm tra `evaluate.py -I` trỏ đúng thư mục đã tồn tại.
+- Chạy đầu tiên chậm/không ổn
+  - Lần đầu có thể phải tải mô hình từ Hugging Face và/hoặc checkpoint từ Google Drive.
 - `video2caption.py` trả về caption rỗng
-  - Kiểm tra đường dẫn script hardcode và Python executable, hoặc chuyển sang `v2c.py`.
-- `wandb` yêu cầu đăng nhập khi huấn luyện
+  - Kiểm tra lại đường dẫn hardcode và đường dẫn python executable, hoặc chuyển sang `v2c.py`.
+- `wandb` yêu cầu đăng nhập trong quá trình train
   - Chạy `wandb login` hoặc tắt logging thủ công trong `training.py` nếu cần.
 
 ## 🛣️ Lộ trình
 
-- Thêm lockfile dependency (`requirements.txt` hoặc `pyproject.toml`) để cài đặt tái lập.
-- Hợp nhất các pipeline video trùng lặp thành một triển khai duy nhất được duy trì.
-- Loại bỏ hardcoded machine paths khỏi các script legacy.
-- Sửa các bug biên nổi tiếng trong `training.py` và `model/trainer.py`.
-- Thêm tests tự động và CI.
-- Bổ sung đầy đủ `i18n/` với các README đã dịch được tham chiếu trong thanh ngôn ngữ.
+- Thêm lockfile phụ thuộc (`requirements.txt` hoặc `pyproject.toml`) để cài đặt tái lập.
+- Gộp các pipeline video trùng lặp về một bản duy nhất đang duy trì.
+- Loại bỏ đường dẫn máy cứng trong các script legacy.
+- Sửa lỗi biên đã biết trong huấn luyện/đánh giá tại `training.py` và `model/trainer.py`.
+- Thêm test tự động và CI.
+- Bổ sung đầy đủ README dịch trong `i18n/` theo đúng ngôn ngữ trên thanh điều hướng.
 
 ## 🤝 Đóng góp
 
-Đóng góp rất được hoan nghênh. Quy trình gợi ý:
+Mọi đóng góp đều được chào đón. Quy trình gợi ý:
 
 ```bash
 # 1) Fork và clone
 git clone git@github.com:<your-user>/VideoCaptionerWithClip.git
 cd VideoCaptionerWithClip
 
-# 2) Tạo nhánh tính năng
+# 2) Tạo nhánh feature
 git checkout -b feat/your-change
 
-# 3) Thực hiện thay đổi và commit
+# 3) Chỉnh sửa và commit
 git add .
 git commit -m "feat: describe your change"
 
@@ -427,20 +445,22 @@ git commit -m "feat: describe your change"
 git push origin feat/your-change
 ```
 
-Nếu bạn thay đổi hành vi của model, hãy kèm theo:
+Nếu bạn sửa đổi hành vi model, cần kèm:
 
-- Lệnh có thể tái lập.
+- Lệnh reproduce được.
 - Ví dụ đầu ra trước/sau.
-- Ghi chú về giả định checkpoint hoặc dataset.
+- Ghi chú về giả định checkpoint hoặc dữ liệu.
+
+---
 
 ## ❤️ Support
 
 | Donate | PayPal | Stripe |
-|---|---|---|
-| [![Donate](https://img.shields.io/badge/Donate-LazyingArt-0EA5E9?style=for-the-badge&logo=ko-fi&logoColor=white)](https://chat.lazying.art/donate) | [![PayPal](https://img.shields.io/badge/PayPal-RongzhouChen-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/RongzhouChen) | [![Stripe](https://img.shields.io/badge/Stripe-Donate-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
+| --- | --- | --- |
+| [![Donate](https://camo.githubusercontent.com/24a4914f0b42c6f435f9e101621f1e52535b02c225764b2f6cc99416926004b7/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446f6e6174652d4c617a79696e674172742d3045413545393f7374796c653d666f722d7468652d6261646765266c6f676f3d6b6f2d6669266c6f676f436f6c6f723d7768697465)](https://chat.lazying.art/donate) | [![PayPal](https://camo.githubusercontent.com/d0f57e8b016517a4b06961b24d0ca87d62fdba16e18bbdb6aba28e978dc0ea21/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50617950616c2d526f6e677a686f754368656e2d3030343537433f7374796c653d666f722d7468652d6261646765266c6f676f3d70617970616c266c6f676f436f6c6f723d7768697465)](https://paypal.me/RongzhouChen) | [![Stripe](https://camo.githubusercontent.com/1152dfe04b6943afe3a8d2953676749603fb9f95e24088c92c97a01a897b4942/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f5374726970652d446f6e6174652d3633354246463f7374796c653d666f722d7468652d6261646765266c6f676f3d737472697065266c6f676f436f6c6f723d7768697465)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
 
-## 📄 Giấy phép
+## 📄 License
 
-Không có tệp license trong snapshot repository hiện tại.
+No license file is present in the current repository snapshot.
 
-Lưu ý giả định: cho đến khi thêm tệp `LICENSE`, điều khoản tái sử dụng/phân phối vẫn chưa được xác định.
+Assumption note: until a `LICENSE` file is added, reuse/distribution terms are undefined.

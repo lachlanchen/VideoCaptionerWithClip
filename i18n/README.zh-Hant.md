@@ -1,6 +1,7 @@
 [English](../README.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [中文 (简体)](README.zh-Hans.md) · [中文（繁體）](README.zh-Hant.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
 
+
 [![LazyingArt banner](https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png)](https://github.com/lachlanchen/lachlanchen/blob/main/figs/banner.png)
 
 # Clip-GPT-Captioning
@@ -13,6 +14,20 @@
 ![Legacy Scripts](https://img.shields.io/badge/Legacy%20Scripts-Present-orange)
 ![i18n](https://img.shields.io/badge/i18n-Enabled-brightgreen)
 ![Maintained Path](https://img.shields.io/badge/Video-v2c.py-2ea44f)
+
+---
+
+## 🧭 快速導覽
+
+| 區段 | 用途 |
+|---|---|
+| Snapshot | 查看儲存庫範圍與目前腳本清單 |
+| Overview | 了解目標與功能 |
+| Usage | 依照精確的 CLI/API 流程操作 |
+| Troubleshooting | 快速排除常見執行問題 |
+| Roadmap | 檢視已知的清理與改進方向 |
+
+---
 
 這是一個 Python 工具包，透過結合 OpenAI CLIP 視覺嵌入與 GPT 風格語言模型，為圖片與影片產生自然語言字幕。
 
@@ -432,14 +447,15 @@ git push origin feat/your-change
 - 變更前後的輸出範例。
 - Checkpoint 與資料集假設備註。
 
-## ❤️ Support
-
-| Donate | PayPal | Stripe |
-|---|---|---|
-| [![Donate](https://img.shields.io/badge/Donate-LazyingArt-0EA5E9?style=for-the-badge&logo=ko-fi&logoColor=white)](https://chat.lazying.art/donate) | [![PayPal](https://img.shields.io/badge/PayPal-RongzhouChen-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/RongzhouChen) | [![Stripe](https://img.shields.io/badge/Stripe-Donate-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
-
 ## 📄 授權
 
 本儲存庫快照目前未提供授權檔。
 
 假設說明：在加入 `LICENSE` 檔前，重製與散佈條款仍未定義。
+
+
+## ❤️ Support
+
+| Donate | PayPal | Stripe |
+| --- | --- | --- |
+| [![Donate](https://camo.githubusercontent.com/24a4914f0b42c6f435f9e101621f1e52535b02c225764b2f6cc99416926004b7/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446f6e6174652d4c617a79696e674172742d3045413545393f7374796c653d666f722d7468652d6261646765266c6f676f3d6b6f2d6669266c6f676f436f6c6f723d7768697465)](https://chat.lazying.art/donate) | [![PayPal](https://camo.githubusercontent.com/d0f57e8b016517a4b06961b24d0ca87d62fdba16e18bbdb6aba28e978dc0ea21/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f50617950616c2d526f6e677a686f754368656e2d3030343537433f7374796c653d666f722d7468652d6261646765266c6f676f3d70617970616c266c6f676f436f6c6f723d7768697465)](https://paypal.me/RongzhouChen) | [![Stripe](https://camo.githubusercontent.com/1152dfe04b6943afe3a8d2953676749603fb9f95e24088c92c97a01a897b4942/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f5374726970652d446f6e6174652d3633354246463f7374796c653d666f722d7468652d6261646765266c6f676f3d737472697065266c6f676f436f6c6f723d7768697465)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
