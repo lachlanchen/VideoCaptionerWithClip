@@ -1,6 +1,9 @@
 [English](README.md) · [العربية](i18n/README.ar.md) · [Español](i18n/README.es.md) · [Français](i18n/README.fr.md) · [日本語](i18n/README.ja.md) · [한국어](i18n/README.ko.md) · [Tiếng Việt](i18n/README.vi.md) · [中文 (简体)](i18n/README.zh-Hans.md) · [中文（繁體）](i18n/README.zh-Hant.md) · [Deutsch](i18n/README.de.md) · [Русский](i18n/README.ru.md)
 
 
+[![LazyingArt banner](https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png)](https://github.com/lachlanchen/lachlanchen/blob/main/figs/banner.png)
+
+
 # Clip-GPT-Captioning
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
@@ -13,6 +16,16 @@
 ![Maintained Path](https://img.shields.io/badge/Video-v2c.py-2ea44f)
 
 A Python toolkit for generating natural-language captions on images and videos by combining OpenAI CLIP visual embeddings with a GPT-style language model.
+
+## 🧭 Snapshot
+
+| Dimension | Details |
+|---|---|
+| Task coverage | Image and video captioning |
+| Core outputs | SRT subtitles, JSON transcripts, captioned images |
+| Primary scripts | `i2c.py`, `v2c.py`, `image2caption.py` |
+| Legacy paths | `video2caption.py` and versioned siblings (kept for history) |
+| Dataset flow | `data/raw/results.csv` + `data/raw/flickr30k_images/` |
 
 ## ✨ Overview
 
@@ -139,6 +152,12 @@ cd VideoCaptionerWithClip/src
 Note: the current repository snapshot places scripts at repo root, not under `src/`.
 
 ## ▶️ Quick Start
+
+| Goal | Command |
+|---|---|
+| Caption an image | `python image2caption.py -I /path/to/image.jpg -S L -C model.pt` |
+| Caption a video | `python v2c.py -V /path/to/video.mp4 -N 10` |
+| Build dataset | `python dataset_generation.py` |
 
 ### Image captioning (quick run)
 
@@ -414,11 +433,11 @@ If you change model behavior, include:
 - Before/after sample outputs.
 - Notes on checkpoint or dataset assumptions.
 
-## 🙌 Support
+## ❤️ Support
 
-No explicit donation/sponsorship configuration is present in the current repository snapshot.
-
-If sponsorship links are added later, they should be preserved in this section.
+| Donate | PayPal | Stripe |
+|---|---|---|
+| [![Donate](https://img.shields.io/badge/Donate-LazyingArt-0EA5E9?style=for-the-badge&logo=ko-fi&logoColor=white)](https://chat.lazying.art/donate) | [![PayPal](https://img.shields.io/badge/PayPal-RongzhouChen-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/RongzhouChen) | [![Stripe](https://img.shields.io/badge/Stripe-Donate-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
 
 ## 📄 License
 

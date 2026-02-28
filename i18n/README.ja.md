@@ -1,6 +1,8 @@
 [English](../README.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [中文 (简体)](README.zh-Hans.md) · [中文（繁體）](README.zh-Hant.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
 
+[![LazyingArt banner](https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png)](https://github.com/lachlanchen/lachlanchen/blob/main/figs/banner.png)
+
 # Clip-GPT-Captioning
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
@@ -12,108 +14,118 @@
 ![i18n](https://img.shields.io/badge/i18n-Enabled-brightgreen)
 ![Maintained Path](https://img.shields.io/badge/Video-v2c.py-2ea44f)
 
-OpenAI CLIP の視覚埋め込みと GPT スタイルの言語モデルを組み合わせ、画像と動画に対して自然言語キャプションを生成する Python ツールキットです。
+OpenAI CLIP の視覚埋め込みと GPT 系言語モデルを組み合わせ、画像と動画に対する自然言語キャプションを生成する Python ツールキットです。
+
+## 🧭 スナップショット
+
+| 項目 | 内容 |
+|---|---|
+| 対応タスク | 画像と動画のキャプション生成 |
+| 主な出力 | SRT 字幕、JSON トランスクリプト、キャプション付き画像 |
+| 主要スクリプト | `i2c.py`、`v2c.py`、`image2caption.py` |
+| レガシーパス | `video2caption.py` とそのバージョン群（履歴保持のため） |
+| データセットフロー | `data/raw/results.csv` + `data/raw/flickr30k_images/` |
 
 ## ✨ 概要
 
-このリポジトリには次が含まれます。
+このリポジトリは次を提供します。
 
-- 画像キャプション生成と動画字幕生成のための推論スクリプト。
-- CLIP の視覚埋め込みから GPT-2 のトークン埋め込みへの写像を学習するトレーニングパイプライン。
+- 画像キャプションと動画字幕生成の推論スクリプト。
+- CLIP 視覚埋め込みを GPT-2 トークン埋め込みに写像する学習パイプライン。
 - Flickr30k 形式データ向けのデータセット生成ユーティリティ。
-- 重みが見つからない場合に、対応モデルサイズのチェックポイントを自動ダウンロード。
-- `i18n/` 配下の多言語 README バリアント（上の言語バーを参照）。
+- 重みが存在しない場合、対応サイズのチェックポイントを自動ダウンロード。
+- `i18n/` 配下の多言語 README（上部の言語バー参照）。
 
-現在の実装には新しいスクリプトとレガシースクリプトの両方が含まれています。一部のレガシーファイルは参照用に保持されており、以下で説明しています。
+現在の実装には新旧のスクリプトが共存しています。いくつかのレガシースクリプトは参照用として残っており、後述で説明します。
 
-## 🚀 特徴
+## 🚀 機能
 
-- `image2caption.py` による単一画像キャプション生成。
-- `v2c.py` または `video2caption.py` による動画キャプション生成（フレーム一様サンプリング）。
-- 実行時オプションをカスタマイズ可能:
-  - フレーム数。
-  - モデルサイズ。
-  - サンプリング温度。
-  - チェックポイント名。
-- マルチプロセス/スレッド対応のキャプション生成による高速な動画推論。
+- `image2caption.py` による単画像キャプション。
+- `v2c.py` または `video2caption.py` による動画キャプション（均一フレームサンプリング）。
+- 実行時設定をカスタマイズ可能:
+  - フレーム数
+  - モデルサイズ
+  - サンプリング温度
+  - チェックポイント名
+- マルチプロセス/スレッド化による高速動画推論。
 - 出力成果物:
-  - SRT 字幕ファイル（`.srt`）。
-  - `v2c.py` での JSON トランスクリプト（`.json`）。
-- CLIP+GPT2 写像実験向けの学習/評価エントリポイント。
+  - SRT 字幕ファイル（`.srt`）
+  - `v2c.py` の JSON トランスクリプト（`.json`）
+- CLIP + GPT2 の写像実験向けトレーニング/評価エントリポイント。
 
-### ひと目でわかる構成
+### 概観
 
-| Area | Primary script(s) | Notes |
+| 領域 | 主なスクリプト | 備考 |
 |---|---|---|
-| Image captioning | `image2caption.py`, `i2c.py`, `predict.py` | CLI + 再利用可能クラス |
-| Video captioning | `v2c.py` | 推奨される保守パス |
-| Legacy video flow | `video2caption.py`, `video2caption_v1.1.py` | マシン依存の前提を含む |
-| Dataset build | `dataset_generation.py` | `data/processed/dataset.pkl` を生成 |
-| Train / eval | `training.py`, `evaluate.py` | CLIP+GPT2 写像を使用 |
+| 画像キャプション | `image2caption.py`, `i2c.py`, `predict.py` | CLI + 再利用可能なクラス |
+| 動画キャプション | `v2c.py` | 推奨で維持される経路 |
+| レガシー動画フロー | `video2caption.py`, `video2caption_v1.1.py` | マシン依存前提を含む |
+| データセット生成 | `dataset_generation.py` | `data/processed/dataset.pkl` を生成 |
+| 学習/評価 | `training.py`, `evaluate.py` | CLIP+GPT2 写像を利用 |
 
 ## 🧱 アーキテクチャ（高レベル）
 
-`model/model.py` の中核モデルは 3 つの部分で構成されています。
+`model/model.py` の中核モデルは 3 つのパートで構成されます。
 
 1. `ImageEncoder`: CLIP 画像埋め込みを抽出。
-2. `Mapping`: CLIP 埋め込みを GPT のプレフィックス埋め込み系列へ射影。
-3. `TextDecoder`: GPT-2 言語モデルヘッドが自己回帰でキャプショントークンを生成。
+2. `Mapping`: CLIP 埋め込みを GPT プレフィックス埋め込み列へ射影。
+3. `TextDecoder`: GPT-2 言語モデルヘッドとして、自己回帰的にキャプショントークンを生成。
 
-学習（`Net.train_forward`）では、事前計算された CLIP 画像埋め込みとトークン化済みキャプションを使用します。
-推論（`Net.forward`）では PIL 画像を使い、EOS または `max_len` までトークンをデコードします。
+学習（`Net.train_forward`）は事前計算済みの CLIP 画像埋め込みとトークン化済みキャプションを使います。
+推論（`Net.forward`）では PIL 画像を受け取り、EOS または `max_len` に到達するまでトークンをデコードします。
 
 ### データフロー
 
-1. データセット準備: `dataset_generation.py` が `data/raw/results.csv` と `data/raw/flickr30k_images/` 内の画像を読み取り、`data/processed/dataset.pkl` を書き出します。
-2. 学習: `training.py` が pickle 化されたタプル `(image_name, image_embedding, caption)` を読み込み、mapper/decoder 層を学習します。
-3. 評価: `evaluate.py` が保持されたテスト画像に生成キャプションを描画します。
-4. 推論実行:
-   - 画像: `image2caption.py` / `predict.py` / `i2c.py`。
-   - 動画: `v2c.py`（推奨）、`video2caption.py`（レガシー）。
+1. データセット準備: `dataset_generation.py` が `data/raw/results.csv` と `data/raw/flickr30k_images/` の画像を読み取り、`data/processed/dataset.pkl` を作成。
+2. 学習: `training.py` がピクル化されたタプル `(image_name, image_embedding, caption)` を読み込み、マッパー/デコーダ層を学習。
+3. 評価: `evaluate.py` がホールドアウトしたテスト画像に対して生成キャプションをレンダリング。
+4. 推論の実行:
+   - 画像: `image2caption.py` / `predict.py` / `i2c.py`
+   - 動画: `v2c.py`（推奨）, `video2caption.py`（レガシー）
 
 ## 🗂️ プロジェクト構成
 
 ```text
 VideoCaptionerWithClip/
 ├── README.md
-├── image2caption.py               # 単一画像キャプション CLI
-├── predict.py                     # 代替の単一画像キャプション CLI
-├── i2c.py                         # 再利用可能な ImageCaptioner クラス + CLI
-├── v2c.py                         # Video -> SRT + JSON（スレッド化フレームキャプション生成）
-├── video2caption.py               # 代替 Video -> SRT 実装（レガシー制約あり）
-├── video2caption_v1.1.py          # 旧バリアント
-├── video2caption_v1.0_not_work.py # 非動作のレガシーファイルとして明示
-├── training.py                    # モデル学習エントリポイント
-├── evaluate.py                    # テスト分割評価と描画出力
-├── dataset_generation.py          # data/processed/dataset.pkl を構築
+├── image2caption.py               # Single-image caption CLI
+├── predict.py                     # Alternate single-image caption CLI
+├── i2c.py                         # Reusable ImageCaptioner class + CLI
+├── v2c.py                         # Video -> SRT + JSON (threaded frame captioning)
+├── video2caption.py               # Alternate video -> SRT implementation (legacy constraints)
+├── video2caption_v1.1.py          # Older variant
+├── video2caption_v1.0_not_work.py # Explicitly marked non-working legacy file
+├── training.py                    # Model training entrypoint
+├── evaluate.py                    # Test-split evaluation and rendered outputs
+├── dataset_generation.py          # Builds data/processed/dataset.pkl
 ├── data/
 │   ├── __init__.py
-│   └── dataset.py                 # Dataset + DataLoader ヘルパー
+│   └── dataset.py                 # Dataset + DataLoader helpers
 ├── model/
 │   ├── __init__.py
 │   ├── model.py                   # CLIP encoder + mapping + GPT2 decoder
-│   └── trainer.py                 # 学習/検証/テスト用ユーティリティクラス
+│   └── trainer.py                 # Training/validation/test utility class
 ├── utils/
 │   ├── __init__.py
-│   ├── config.py                  # ConfigS / ConfigL デフォルト
-│   ├── downloads.py               # Google Drive チェックポイントダウンローダー
-│   └── lr_warmup.py               # LR warmup スケジュール
-├── i18n/                          # 多言語 README バリアント
-└── .auto-readme-work/             # Auto-README パイプライン成果物
+│   ├── config.py                  # ConfigS / ConfigL defaults
+│   ├── downloads.py               # Google Drive checkpoint downloader
+│   └── lr_warmup.py               # LR warmup schedule
+├── i18n/                          # Multilingual README variants
+└── .auto-readme-work/             # Auto-README pipeline artifacts
 ```
 
 ## 📋 前提条件
 
-- Python `3.10+` 推奨。
-- CUDA 対応 GPU は必須ではありませんが、学習や大規模モデル推論では強く推奨。
-- 現在のスクリプトでは `ffmpeg` は直接不要です（フレーム抽出は OpenCV を使用）。
-- Hugging Face / Google Drive から初回にモデル/チェックポイントをダウンロードするため、インターネット接続が必要です。
+- Python `3.10+` を推奨。
+- 学習と大きめモデルの推論には CUDA 対応 GPU が望ましい（必須ではありません）。
+- 現在のスクリプトでは `ffmpeg` は直接必要ありません（フレーム抽出は OpenCV を使用）。
+- Hugging Face / Google Drive から初回モデル/チェックポイントを取得するためにはネットワーク接続が必要です。
 
-現時点では lockfile（`requirements.txt` / `pyproject.toml`）が存在しないため、依存関係は import から推定されます。
+現在、ロックファイルは存在しません（`requirements.txt` / `pyproject.toml` が未配置）ので、依存関係は import から推定されます。
 
 ## 🛠️ インストール
 
-### 現在のリポジトリ構成に基づく標準セットアップ
+### 現在のリポジトリ構成に合わせた正規セットアップ
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
@@ -127,34 +139,40 @@ pip install torch torchvision torchaudio
 pip install transformers pillow matplotlib numpy tqdm opencv-python pandas wandb gdown
 ```
 
-### 元 README のインストールスニペット（保持）
+### 元 README 由来のインストール断片（保持）
 
-以前の README はコードブロック途中で終わっていました。以下の元コマンドは、履歴上の一次情報としてソースどおりに保持しています。
+以前の README は途中で途切れていたため、ソース・オブ・トゥルースとして歴史的コマンドをそのまま残します。
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
 cd VideoCaptionerWithClip/src
 ```
 
-注意: 現在のリポジトリスナップショットでは、スクリプトは `src/` 配下ではなくリポジトリ直下に配置されています。
+注記: 現在のリポジトリではスクリプトはルート配下にあり、`src/` 配下にはありません。
 
 ## ▶️ クイックスタート
 
-### 画像キャプション生成（クイック実行）
+| 目的 | コマンド |
+|---|---|
+| 画像のキャプション生成 | `python image2caption.py -I /path/to/image.jpg -S L -C model.pt` |
+| 動画のキャプション生成 | `python v2c.py -V /path/to/video.mp4 -N 10` |
+| データセット生成 | `python dataset_generation.py` |
+
+### 画像キャプションの簡易実行
 
 ```bash
 python image2caption.py -I /path/to/image.jpg -S L -C model.pt
 ```
 
-### 動画キャプション生成（推奨パス）
+### 動画キャプション（推奨）
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
 ```
 
-## 🎯 使い方
+## 🎯 利用方法
 
-### 1. 画像キャプション生成（`image2caption.py`）
+### 1. 画像キャプション (`image2caption.py`)
 
 ```bash
 python image2caption.py \
@@ -169,11 +187,11 @@ python image2caption.py \
 
 - `-I, --img-path`: 入力画像のパス。
 - `-S, --size`: モデルサイズ（`S` または `L`）。
-- `-C, --checkpoint-name`: `weights/{small|large}` 内のチェックポイントファイル名。
-- `-R, --res-path`: キャプション描画済み画像の出力ディレクトリ。
+- `-C, --checkpoint-name`: `weights/{small|large}` 配下のチェックポイント名。
+- `-R, --res-path`: キャプション画像の保存先ディレクトリ。
 - `-T, --temperature`: サンプリング温度。
 
-### 2. 代替画像 CLI（`predict.py`）
+### 2. 代替画像 CLI (`predict.py`)
 
 ```bash
 python predict.py \
@@ -184,15 +202,15 @@ python predict.py \
   -T 1.0
 ```
 
-`predict.py` は `image2caption.py` と機能的にはほぼ同じですが、出力テキストのフォーマットがわずかに異なります。
+`predict.py` は `image2caption.py` と機能的にほぼ同等で、出力テキストの整形がわずかに異なります。
 
-### 3. 画像キャプション生成クラス API（`i2c.py`）
+### 3. 画像キャプションクラス API (`i2c.py`)
 
 ```bash
 python i2c.py -I /path/to/image.jpg -S L -C model.pt -R ./data/result/prediction -T 1.0
 ```
 
-または自分のスクリプトで import:
+または独自スクリプトからインポートできます。
 
 ```python
 from i2c import ImageCaptioner
@@ -203,34 +221,34 @@ caption = captioner.generate_caption(save_image=True)
 print(caption)
 ```
 
-### 4. 動画から字幕 + JSON（`v2c.py`）
+### 4. 動画 -> 字幕＋JSON (`v2c.py`)
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
 ```
 
-入力動画の隣に次を出力します。
+入力動画の隣に以下が出力されます。
 
 - `<video_basename>_caption.srt`
 - `<video_basename>_caption.json`
 - `<video_basename>_captioning_frames/`
 
-### 5. 代替動画パイプライン（`video2caption.py`）
+### 5. 代替動画パイプライン (`video2caption.py`)
 
 ```bash
 python video2caption.py -V /path/to/video.mp4 -N 10
 ```
 
-重要: このスクリプトには現在、マシン依存のハードコードされたパスが含まれています。
+重要: このスクリプトは現在、マシン依存のハードコードパスを含みます。
 
-- Python path default: `/home/lachlan/miniconda3/envs/caption/bin/python`
-- Caption script path: `/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
+- Python デフォルトパス: `/home/lachlan/miniconda3/envs/caption/bin/python`
+- キャプション実行スクリプトパス: `/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
 
-これらのパスを意図的に保守する場合を除き、`v2c.py` の使用を推奨します。
+これらのパスを意図的に維持する場合を除き、`v2c.py` を使用してください。
 
-### 6. レガシーバリアント（`video2caption_v1.1.py`）
+### 6. レガシー版 (`video2caption_v1.1.py`)
 
-このスクリプトは履歴参照のために保持されています。実運用では `v2c.py` を優先してください。
+このスクリプトは履歴参照用に保持されています。実運用では `v2c.py` を推奨します。
 
 ### 7. データセット生成
 
@@ -238,10 +256,10 @@ python video2caption.py -V /path/to/video.mp4 -N 10
 python dataset_generation.py
 ```
 
-想定される生入力:
+想定される入力:
 
-- `data/raw/results.csv`（パイプ区切りのキャプションテーブル）。
-- `data/raw/flickr30k_images/`（CSV で参照される画像ファイル）。
+- `data/raw/results.csv`（`|` 区切りのキャプション表）
+- `data/raw/flickr30k_images/`（CSV で参照される画像）
 
 出力:
 
@@ -253,7 +271,7 @@ python dataset_generation.py
 python training.py -S L -C model.pt
 ```
 
-学習ではデフォルトで Weights & Biases（`wandb`）ロギングを使用します。
+学習は既定で Weights & Biases（`wandb`）ロギングを使用します。
 
 ### 9. 評価
 
@@ -266,22 +284,22 @@ python evaluate.py \
   -T 1.0
 ```
 
-評価では、予測キャプションをテスト画像に描画し、次の場所に保存します。
+評価ではホールドアウトしたテスト画像上に予測キャプションを描画し、次の場所へ保存します。
 
 - `<res-path>/<checkpoint_name_without_ext>_<SIZE>/`
 
 ## ⚙️ 設定
 
-モデル設定は `utils/config.py` で定義されています。
+モデル設定は `utils/config.py` に定義されています。
 
-| Config | CLIP backbone | GPT model | Weights dir |
+| 設定名 | CLIP バックボーン | GPT モデル | 重みディレクトリ |
 |---|---|---|---|
 | `ConfigS` | `openai/clip-vit-base-patch32` | `gpt2` | `weights/small` |
 | `ConfigL` | `openai/clip-vit-large-patch14` | `gpt2-medium` | `weights/large` |
 
-設定クラスの主要デフォルト値:
+各設定クラスの主要デフォルト:
 
-| Field | `ConfigS` | `ConfigL` |
+| 項目 | `ConfigS` | `ConfigL` |
 |---|---:|---:|
 | `epochs` | 150 | 120 |
 | `lr` | 3e-3 | 5e-3 |
@@ -291,7 +309,7 @@ python evaluate.py \
 
 チェックポイント自動ダウンロード ID は `utils/downloads.py` にあります。
 
-| Size | Google Drive ID |
+| サイズ | Google Drive ID |
 |---|---|
 | `L` | `1Gh32arzhW06C1ZJyzcJSSfdJDi3RgWoG` |
 | `S` | `1pSQruQyg8KJq6VmzhMLFbT_VaHJMdlWF` |
@@ -300,16 +318,16 @@ python evaluate.py \
 
 ### 画像推論
 
-- `--res-path` に、タイトルを重ねた/生成した画像を保存。
+- `--res-path` へ、上にテキストを重畳して保存された画像を出力。
 - ファイル名パターン: `<input_stem>-R<SIZE>.jpg`。
 
-### 動画推論（`v2c.py`）
+### 動画推論 (`v2c.py`)
 
 - SRT: `<video_stem>_caption.srt`
 - JSON: `<video_stem>_caption.json`
 - フレーム画像: `<video_stem>_captioning_frames/`
 
-JSON 要素の例:
+JSON の要素例:
 
 ```json
 {
@@ -320,32 +338,32 @@ JSON 要素の例:
 }
 ```
 
-## 🧪 例
+## 🧪 使用例
 
-### 画像キャプションのクイック例
+### 画像キャプションの簡易例
 
 ```bash
 python image2caption.py -I ./examples/dog.jpg -S S -C model.pt
 ```
 
-期待される動作:
+想定される動作:
 
-- `weights/small/model.pt` がない場合はダウンロードされます。
-- デフォルトでは `./data/result/prediction` にキャプション付き画像が出力されます。
-- キャプションテキストが標準出力に表示されます。
+- `weights/small/model.pt` が存在しない場合は自動でダウンロードされます。
+- キャプション付き画像は既定で `./data/result/prediction` に保存されます。
+- キャプション本文は標準出力へ出力されます。
 
-### 動画キャプションのクイック例
+### 動画キャプションの簡易例
 
 ```bash
 python v2c.py -V ./examples/demo.mp4 -N 8
 ```
 
-期待される動作:
+想定される動作:
 
-- 一様サンプリングした 8 フレームにキャプションが付与されます。
-- 入力動画と同じ場所に `.srt` と `.json` が生成されます。
+- 8 つの均一サンプリングフレームがキャプション化されます。
+- 入力動画の隣に `.srt` と `.json` が生成されます。
 
-### 学習/評価のエンドツーエンド手順
+### エンドツーエンドの学習・評価シーケンス
 
 ```bash
 python dataset_generation.py
@@ -353,44 +371,44 @@ python training.py -S L -C model.pt
 python evaluate.py -I ./data/raw/flickr30k_images -R ./data/result/eval -S L -C model.pt -T 1.0
 ```
 
-## 🧭 開発メモ
+## 🧭 開発ノート
 
-- `v2c.py`、`video2caption.py`、`video2caption_v1.*` の間にレガシー重複があります。
-- `video2caption_v1.0_not_work.py` は、意図的に非動作のレガシーコードとして保持されています。
-- `training.py` は現在 `config = ConfigL() if args.size.upper() else ConfigS()` を使っており、`--size` が空でない限り常に `ConfigL` に解決されます。
-- `model/trainer.py` の `test_step` は `self.dataset` を使いますが、初期化時には `self.test_dataset` を代入しているため、調整しないと学習実行時のサンプリングが壊れる可能性があります。
-- `video2caption_v1.1.py` は `self.config.transform` を参照しますが、`ConfigS`/`ConfigL` は `transform` を定義していません。
-- このリポジトリスナップショットには CI/テストスイートが未定義です。
-- i18n メモ: この README の先頭には言語リンクがあります。翻訳ファイルは `i18n/` 配下に追加できます。
-- 現在の状態メモ: 言語バーは `i18n/README.ru.md` を指していますが、このスナップショットにはそのファイルがありません。
+- `v2c.py`、`video2caption.py`、`video2caption_v1.*` 間に重複が残っています。
+- `video2caption_v1.0_not_work.py` は意図的に非動作のレガシーコードとして保持。
+- `training.py` は `config = ConfigL() if args.size.upper() else ConfigS()` で `config` を選択しており、`--size` が空でない場合は常に `ConfigL` になります。
+- `model/trainer.py` の `test_step` では `self.dataset` を参照しますが、初期化側は `self.test_dataset` を代入しているため、調整しないと学習実行時にサンプリングが壊れる可能性があります。
+- `video2caption_v1.1.py` は `self.config.transform` を参照しますが、`ConfigS` / `ConfigL` は `transform` を定義していません。
+- このスナップショット時点で CI/テストスイートは定義されていません。
+- i18n の注: 言語リンクはこの README の冒頭にあります。翻訳ファイルは `i18n/` に追加可能です。
+- 現状ノート: 言語バーは `i18n/README.ru.md` を指していますが、このスナップショットには当該ファイルがありません。
 
 ## 🩺 トラブルシューティング
 
 - `AssertionError: Image does not exist`
-  - `-I/--img-path` が有効なファイルを指しているか確認してください。
+  - `-I/--img-path` が有効なファイルを指しているか確認します。
 - `Dataset file not found. Downloading...`
-  - `data/processed/dataset.pkl` が存在しない場合に `MiniFlickrDataset` がこのエラーを出します。先に `python dataset_generation.py` を実行してください。
+  - `MiniFlickrDataset` は `data/processed/dataset.pkl` が欠落しているとこのメッセージを出し、`python dataset_generation.py` の先行実行を要求します。
 - `Path to the test image folder does not exist`
-  - `evaluate.py -I` が存在するフォルダを指しているか確認してください。
-- 初回実行が遅い/失敗する
-  - 初回実行では Hugging Face モデルをダウンロードし、Google Drive からチェックポイントもダウンロードする場合があります。
+  - `evaluate.py -I` が既存のフォルダを指しているか確認します。
+- 初回実行が遅い／失敗する
+  - 初回は Hugging Face モデルのダウンロードや Google Drive からのチェックポイント取得が発生するためです。
 - `video2caption.py` が空のキャプションを返す
-  - ハードコードされたスクリプトパスと Python 実行パスを確認するか、`v2c.py` に切り替えてください。
-- 学習中に `wandb` ログインを求められる
-  - `wandb login` を実行するか、必要に応じて `training.py` 内でロギングを手動で無効化してください。
+  - ハードコードされたスクリプトパスや Python 実行パスを確認するか、`v2c.py` に切り替えます。
+- 学習中に `wandb` がログインを要求する
+  - `wandb login` を実行するか、必要に応じて `training.py` で手動でロギングを無効化してください。
 
 ## 🛣️ ロードマップ
 
-- 再現可能なインストールのため、依存関係 lockfile（`requirements.txt` または `pyproject.toml`）を追加。
-- 重複している動画パイプラインを 1 つの保守実装に統合。
-- レガシースクリプトからマシン依存のハードコードパスを削除。
-- `training.py` と `model/trainer.py` の既知の学習/評価エッジケースバグを修正。
+- 再現性のあるインストールのため、依存ロックファイル（`requirements.txt` または `pyproject.toml`）を追加。
+- 重複した動画パイプラインを 1 つに統一し、単一の維持対象実装へ集約。
+- レガシースクリプトからマシン依存パスを除去。
+- `training.py` と `model/trainer.py` の既知の学習・評価エッジケースバグを修正。
 - 自動テストと CI を追加。
-- 言語バーで参照している README 翻訳ファイルを `i18n/` に揃える。
+- 言語バーで参照されている `i18n/` 配下の翻訳 README を揃える。
 
-## 🤝 コントリビューション
+## 🤝 貢献
 
-コントリビューションを歓迎します。推奨ワークフロー:
+コントリビューションは歓迎します。推奨フロー:
 
 ```bash
 # 1) Fork and clone
@@ -408,20 +426,20 @@ git commit -m "feat: describe your change"
 git push origin feat/your-change
 ```
 
-モデル挙動を変更する場合は、次を含めてください。
+モデル挙動を変更する場合は以下を含めてください。
 
-- 再現可能なコマンド。
-- 変更前/変更後のサンプル出力。
-- チェックポイントまたはデータセット前提に関するメモ。
+- 再現可能なコマンド
+- 変更前/変更後のサンプル出力
+- チェックポイントまたはデータセット前提の注記
 
-## 🙌 サポート
+## ❤️ Support
 
-現在のリポジトリスナップショットには、寄付/スポンサー設定は明示されていません。
-
-今後スポンサーリンクが追加された場合は、このセクションに保持してください。
+| Donate | PayPal | Stripe |
+|---|---|---|
+| [![Donate](https://img.shields.io/badge/Donate-LazyingArt-0EA5E9?style=for-the-badge&logo=ko-fi&logoColor=white)](https://chat.lazying.art/donate) | [![PayPal](https://img.shields.io/badge/PayPal-RongzhouChen-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/RongzhouChen) | [![Stripe](https://img.shields.io/badge/Stripe-Donate-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
 
 ## 📄 ライセンス
 
 現在のリポジトリスナップショットにはライセンスファイルがありません。
 
-前提メモ: `LICENSE` ファイルが追加されるまで、再利用/再配布の条件は未定義です。
+注記: `LICENSE` ファイルが追加されるまでは、再利用・再配布条件は未定義です。

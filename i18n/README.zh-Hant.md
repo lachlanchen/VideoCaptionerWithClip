@@ -1,6 +1,8 @@
 [English](../README.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [中文 (简体)](README.zh-Hans.md) · [中文（繁體）](README.zh-Hant.md) · [Deutsch](README.de.md) · [Русский](README.ru.md)
 
 
+[![LazyingArt banner](https://github.com/lachlanchen/lachlanchen/raw/main/figs/banner.png)](https://github.com/lachlanchen/lachlanchen/blob/main/figs/banner.png)
+
 # Clip-GPT-Captioning
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
@@ -12,62 +14,72 @@
 ![i18n](https://img.shields.io/badge/i18n-Enabled-brightgreen)
 ![Maintained Path](https://img.shields.io/badge/Video-v2c.py-2ea44f)
 
-這是一個 Python 工具包，透過結合 OpenAI CLIP 視覺嵌入與 GPT 風格語言模型，為圖片與影片產生自然語言描述。
+這是一個 Python 工具包，透過結合 OpenAI CLIP 視覺嵌入與 GPT 風格語言模型，為圖片與影片產生自然語言字幕。
+
+## 🧭 Snapshot
+
+| 維度 | 詳細 |
+|---|---|
+| 任務覆蓋 | 圖片與影片字幕生成 |
+| 核心輸出 | SRT 字幕、JSON 逐字稿、標註後的圖片 |
+| 主要腳本 | `i2c.py`、`v2c.py`、`image2caption.py` |
+| 舊版路徑 | `video2caption.py` 與其版本分支（保留供參考） |
+| 資料流程 | `data/raw/results.csv` + `data/raw/flickr30k_images/` |
 
 ## ✨ 概覽
 
 此儲存庫提供：
 
-- 用於圖片描述與影片字幕生成的推論腳本。
-- 透過 CLIP 視覺嵌入對映到 GPT-2 token 嵌入的訓練流程。
-- Flickr30k 風格資料集的生成工具。
-- 當權重缺失時，支援模型尺寸的自動 checkpoint 下載。
-- 位於 `i18n/` 的多語 README 版本（見上方語言列）。
+- 圖片描述與影片字幕生成的推論腳本。
+- 一套訓練流程，學習將 CLIP 視覺嵌入映射到 GPT-2 token 嵌入。
+- 適用於 Flickr30k 風格資料的資料集生成工具。
+- 當缺少權重時，自動下載支援的模型尺寸。
+- `i18n/` 下的多語 README 版本（見語言列）。
 
-目前實作同時包含較新的腳本與舊版腳本。部分舊版檔案為參考用途而保留，並已在下文說明。
+目前實作包含新舊兩套腳本。部分舊版檔案仍保留以供參考，並在下方說明。
 
 ## 🚀 功能
 
-- 透過 `image2caption.py` 進行單張圖片描述。
-- 透過 `v2c.py` 或 `video2caption.py` 進行影片描述（均勻抽幀）。
-- 可自訂執行選項：
-  - 影格數量。
+- 透過 `image2caption.py` 進行單張圖片字幕輸出。
+- 透過 `v2c.py` 或 `video2caption.py` 進行影片字幕（均勻取樣影格）。
+- 可調整的執行參數：
+  - 影格數。
   - 模型尺寸。
-  - 取樣溫度。
+  - 採樣溫度。
   - Checkpoint 名稱。
-- 多程序/多執行緒描述流程以加速影片推論。
-- 輸出產物：
+- 多核心/多執行緒的影片推論，提升處理速度。
+- 輸出成果：
   - SRT 字幕檔（`.srt`）。
   - `v2c.py` 產生的 JSON 逐字稿（`.json`）。
-- 用於 CLIP+GPT2 對映實驗的訓練與評估入口。
+- CLIP+GPT2 映射實驗的訓練與評估入口。
 
-### 一覽
+### 一眼看懂
 
-| 區域 | 主要腳本 | 備註 |
+| 區域 | 主要腳本 | 說明 |
 |---|---|---|
-| 圖片描述 | `image2caption.py`, `i2c.py`, `predict.py` | CLI + 可重用類別 |
-| 影片描述 | `v2c.py` | 建議的維護路徑 |
-| 舊版影片流程 | `video2caption.py`, `video2caption_v1.1.py` | 含機器特定假設 |
+| 圖片描述 | `image2caption.py`、`i2c.py`、`predict.py` | CLI 與可重用類別 |
+| 影片描述 | `v2c.py` | 建議使用的維護路徑 |
+| 舊版影片流程 | `video2caption.py`、`video2caption_v1.1.py` | 含機器特定假設 |
 | 資料集建置 | `dataset_generation.py` | 產生 `data/processed/dataset.pkl` |
-| 訓練 / 評估 | `training.py`, `evaluate.py` | 使用 CLIP+GPT2 對映 |
+| 訓練 / 評估 | `training.py`、`evaluate.py` | 使用 CLIP+GPT2 映射 |
 
-## 🧱 架構（高層）
+## 🧱 架構（高階）
 
-`model/model.py` 中的核心模型包含三個部分：
+`model/model.py` 的核心模型包含三個部份：
 
 1. `ImageEncoder`：萃取 CLIP 圖像嵌入。
-2. `Mapping`：將 CLIP 嵌入投影為 GPT 前綴嵌入序列。
-3. `TextDecoder`：GPT-2 語言模型頭，以自回歸方式生成描述 token。
+2. `Mapping`：將 CLIP 嵌入投影到 GPT 前綴嵌入序列。
+3. `TextDecoder`：GPT-2 語言模型頭，透過自回歸方式逐字生成字幕 token。
 
-訓練（`Net.train_forward`）使用預先計算的 CLIP 圖像嵌入與分詞後描述。
-推論（`Net.forward`）使用 PIL 圖片，解碼 token 直到 EOS 或 `max_len`。
+訓練流程（`Net.train_forward`）使用預先計算好的 CLIP 圖像嵌入與分詞後字幕。
+推論流程（`Net.forward`）使用 PIL 圖片，並持續解碼 token 至 EOS 或 `max_len`。
 
 ### 資料流程
 
-1. 準備資料集：`dataset_generation.py` 讀取 `data/raw/results.csv` 與 `data/raw/flickr30k_images/` 中圖片，寫入 `data/processed/dataset.pkl`。
-2. 訓練：`training.py` 載入 pickled tuple `(image_name, image_embedding, caption)` 並訓練 mapper/decoder 層。
-3. 評估：`evaluate.py` 在保留測試圖片上渲染生成描述。
-4. 提供推論：
+1. 準備資料集：`dataset_generation.py` 讀取 `data/raw/results.csv` 與 `data/raw/flickr30k_images/`，並寫入 `data/processed/dataset.pkl`。
+2. 訓練：`training.py` 載入 pickled tuple `(image_name, image_embedding, caption)`，並訓練映射／解碼層。
+3. 評估：`evaluate.py` 在保留測試影像上輸出預測字幕。
+4. 推論入口：
    - 圖片：`image2caption.py` / `predict.py` / `i2c.py`。
    - 影片：`v2c.py`（建議）、`video2caption.py`（舊版）。
 
@@ -105,15 +117,15 @@ VideoCaptionerWithClip/
 ## 📋 先決條件
 
 - 建議使用 Python `3.10+`。
-- 可使用 CUDA 的 GPU 為可選，但強烈建議用於訓練與大型模型推論。
-- 目前腳本不直接需要 `ffmpeg`（影格擷取使用 OpenCV）。
-- 首次執行下載 Hugging Face / Google Drive 的模型與 checkpoint 時需要網路連線。
+- 可用 CUDA 的 GPU 非必要但強烈建議用於訓練與大型模型推論。
+- 目前腳本不直接依賴 `ffmpeg`（影格擷取使用 OpenCV）。
+- 首次從 Hugging Face / Google Drive 下載模型與 checkpoint 時需要網路連線。
 
-目前沒有 lockfile（缺少 `requirements.txt` / `pyproject.toml`），因此依賴套件由 import 內容推斷。
+目前未提供鎖檔（缺少 `requirements.txt` / `pyproject.toml`），故可推測依賴自匯入模組。
 
 ## 🛠️ 安裝
 
-### 依目前儲存庫結構的標準安裝
+### 依目前儲存庫佈局的標準安裝方式
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
@@ -127,26 +139,32 @@ pip install torch torchvision torchaudio
 pip install transformers pillow matplotlib numpy tqdm opencv-python pandas wandb gdown
 ```
 
-### 原始 README 安裝片段（保留）
+### 保留原始 README 的安裝片段
 
-先前 README 在程式碼區塊中途結束。下列原始指令完整保留，作為具權威性的歷史內容：
+舊版 README 在程式碼區段中途中斷，保留原始指令如下，作為歷史真值內容：
 
 ```bash
 git clone git@github.com:lachlanchen/VideoCaptionerWithClip.git
 cd VideoCaptionerWithClip/src
 ```
 
-注意：目前儲存庫快照將腳本放在 repo 根目錄，而非 `src/`。
+注意：目前儲存庫快照將腳本放在 repo 根目錄，而不是 `src/` 下。
 
 ## ▶️ 快速開始
 
-### 圖片描述（快速執行）
+| 目標 | 指令 |
+|---|---|
+| 對圖片進行字幕 | `python image2caption.py -I /path/to/image.jpg -S L -C model.pt` |
+| 對影片進行字幕 | `python v2c.py -V /path/to/video.mp4 -N 10` |
+| 建立資料集 | `python dataset_generation.py` |
+
+### 圖片字幕（快速執行）
 
 ```bash
 python image2caption.py -I /path/to/image.jpg -S L -C model.pt
 ```
 
-### 影片描述（建議路徑）
+### 影片字幕（建議路徑）
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
@@ -169,9 +187,9 @@ python image2caption.py \
 
 - `-I, --img-path`：輸入圖片路徑。
 - `-S, --size`：模型尺寸（`S` 或 `L`）。
-- `-C, --checkpoint-name`：`weights/{small|large}` 中的 checkpoint 檔名。
-- `-R, --res-path`：輸出加上描述文字圖片的目錄。
-- `-T, --temperature`：取樣溫度。
+- `-C, --checkpoint-name`：`weights/{small|large}` 下的 checkpoint 檔名。
+- `-R, --res-path`：輸出加註字幕圖片的資料夾。
+- `-T, --temperature`：採樣溫度。
 
 ### 2. 替代圖片 CLI（`predict.py`）
 
@@ -184,7 +202,7 @@ python predict.py \
   -T 1.0
 ```
 
-`predict.py` 功能與 `image2caption.py` 類似；輸出文字格式略有差異。
+`predict.py` 功能上與 `image2caption.py` 類似，輸出文字格式略有差異。
 
 ### 3. 圖片描述類別 API（`i2c.py`）
 
@@ -192,7 +210,7 @@ python predict.py \
 python i2c.py -I /path/to/image.jpg -S L -C model.pt -R ./data/result/prediction -T 1.0
 ```
 
-或在你的腳本中匯入：
+或在自訂腳本中引入：
 
 ```python
 from i2c import ImageCaptioner
@@ -203,13 +221,13 @@ caption = captioner.generate_caption(save_image=True)
 print(caption)
 ```
 
-### 4. 影片轉字幕 + JSON（`v2c.py`）
+### 4. 影片轉字幕與 JSON（`v2c.py`）
 
 ```bash
 python v2c.py -V /path/to/video.mp4 -N 10
 ```
 
-輸出於輸入影片旁：
+輸出與輸入影片同目錄：
 
 - `<video_basename>_caption.srt`
 - `<video_basename>_caption.json`
@@ -221,16 +239,16 @@ python v2c.py -V /path/to/video.mp4 -N 10
 python video2caption.py -V /path/to/video.mp4 -N 10
 ```
 
-重要：此腳本目前包含機器特定硬編碼路徑：
+重要：此腳本目前仍保留機器特定的硬編碼路徑：
 
-- Python 路徑預設：`/home/lachlan/miniconda3/envs/caption/bin/python`
-- 描述腳本路徑：`/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
+- Python 預設路徑：`/home/lachlan/miniconda3/envs/caption/bin/python`
+- 字幕腳本路徑：`/home/lachlan/Projects/image_captioning/clip-gpt-captioning/src/image2caption.py`
 
-除非你打算維護這些路徑，否則請使用 `v2c.py`。
+除非你刻意維護這些路徑，否則請改用 `v2c.py`。
 
 ### 6. 舊版變體（`video2caption_v1.1.py`）
 
-此腳本保留作為歷史參考。實際使用請優先選擇 `v2c.py`。
+此腳本保留為歷史參考；實際使用請優先採用 `v2c.py`。
 
 ### 7. 生成資料集
 
@@ -238,10 +256,10 @@ python video2caption.py -V /path/to/video.mp4 -N 10
 python dataset_generation.py
 ```
 
-預期原始輸入：
+預期輸入：
 
-- `data/raw/results.csv`（以 pipe 分隔的描述表格）。
-- `data/raw/flickr30k_images/`（CSV 引用的圖片檔）。
+- `data/raw/results.csv`（以管線符號 `|` 分隔的描述表）。
+- `data/raw/flickr30k_images/`（CSV 中參照的圖片檔）。
 
 輸出：
 
@@ -253,7 +271,7 @@ python dataset_generation.py
 python training.py -S L -C model.pt
 ```
 
-訓練預設啟用 Weights & Biases（`wandb`）記錄。
+訓練預設使用 Weights & Biases（`wandb`）記錄。
 
 ### 9. 評估
 
@@ -266,7 +284,7 @@ python evaluate.py \
   -T 1.0
 ```
 
-評估會將預測描述渲染到測試圖片上，並儲存於：
+評估會將預測結果疊加到測試影像並儲存至：
 
 - `<res-path>/<checkpoint_name_without_ext>_<SIZE>/`
 
@@ -279,7 +297,7 @@ python evaluate.py \
 | `ConfigS` | `openai/clip-vit-base-patch32` | `gpt2` | `weights/small` |
 | `ConfigL` | `openai/clip-vit-large-patch14` | `gpt2-medium` | `weights/large` |
 
-設定類別的關鍵預設值：
+關鍵預設值：
 
 | 欄位 | `ConfigS` | `ConfigL` |
 |---|---:|---:|
@@ -289,7 +307,7 @@ python evaluate.py \
 | `ep_len` | 4 | 4 |
 | `max_len` | 40 | 40 |
 
-Checkpoint 自動下載 ID 位於 `utils/downloads.py`：
+Checkpoint 自動下載 ID 記錄於 `utils/downloads.py`：
 
 | 尺寸 | Google Drive ID |
 |---|---|
@@ -300,7 +318,7 @@ Checkpoint 自動下載 ID 位於 `utils/downloads.py`：
 
 ### 圖片推論
 
-- 儲存帶有覆蓋/生成標題的圖片至 `--res-path`。
+- 儲存疊加字幕的圖片到 `--res-path`。
 - 檔名格式：`<input_stem>-R<SIZE>.jpg`。
 
 ### 影片推論（`v2c.py`）
@@ -322,7 +340,7 @@ JSON 元素範例：
 
 ## 🧪 範例
 
-### 快速圖片描述範例
+### 快速圖片字幕範例
 
 ```bash
 python image2caption.py -I ./examples/dog.jpg -S S -C model.pt
@@ -330,11 +348,11 @@ python image2caption.py -I ./examples/dog.jpg -S S -C model.pt
 
 預期行為：
 
-- 若缺少 `weights/small/model.pt`，會自動下載。
-- 預設會將描述圖片輸出到 `./data/result/prediction`。
-- 描述文字會輸出到 stdout。
+- 如果 `weights/small/model.pt` 不存在，將會下載。
+- 預設會輸出字幕圖片至 `./data/result/prediction`。
+- 字幕文字將輸出至標準輸出（stdout）。
 
-### 快速影片描述範例
+### 快速影片字幕範例
 
 ```bash
 python v2c.py -V ./examples/demo.mp4 -N 8
@@ -342,10 +360,10 @@ python v2c.py -V ./examples/demo.mp4 -N 8
 
 預期行為：
 
-- 會對 8 個均勻抽樣影格產生描述。
-- `.srt` 與 `.json` 檔會在輸入影片旁生成。
+- 會對 8 個均勻抽樣的影格產生字幕。
+- `.srt` 與 `.json` 會與輸入影片一併生成。
 
-### 端到端訓練/評估流程
+### 端到端訓練與評估流程
 
 ```bash
 python dataset_generation.py
@@ -355,42 +373,42 @@ python evaluate.py -I ./data/raw/flickr30k_images -R ./data/result/eval -S L -C 
 
 ## 🧭 開發說明
 
-- `v2c.py`、`video2caption.py` 與 `video2caption_v1.*` 之間存在舊版功能重疊。
-- `video2caption_v1.0_not_work.py` 刻意保留為不可運作的舊版程式碼。
-- `training.py` 目前透過 `config = ConfigL() if args.size.upper() else ConfigS()` 選擇 `ConfigL()`，對非空 `--size` 值都會解析為 `ConfigL`。
-- `model/trainer.py` 在 `test_step` 使用 `self.dataset`，但初始化時指定的是 `self.test_dataset`；若不調整，訓練流程中的抽樣可能失敗。
-- `video2caption_v1.1.py` 參考了 `self.config.transform`，但 `ConfigS`/`ConfigL` 並未定義 `transform`。
-- 目前儲存庫快照未定義 CI/測試套件。
-- i18n 說明：本 README 頂部已有語言連結；翻譯檔可新增於 `i18n/`。
-- 目前狀態說明：語言列連到 `i18n/README.ru.md`，但此快照中該檔案不存在。
+- `v2c.py`、`video2caption.py` 與 `video2caption_v1.*` 間有舊版流程重疊。
+- `video2caption_v1.0_not_work.py` 有意保留作為不能運作的舊版程式碼。
+- `training.py` 目前透過 `config = ConfigL() if args.size.upper() else ConfigS()` 選取 `ConfigL()`，對非空 `--size` 都會解析為 `ConfigL`。
+- `model/trainer.py` 在 `test_step` 使用 `self.dataset`，但初始化時是 `self.test_dataset`，可能導致訓練取樣失敗，需視情況修正。
+- `video2caption_v1.1.py` 使用 `self.config.transform`，但 `ConfigS`／`ConfigL` 並未定義 `transform`。
+- 目前本儲存庫快照未建立 CI / 測試套件。
+- i18n 備註：README 頂部已有語言連結，可在 `i18n/` 中新增翻譯。
+- 現況備註：語言列鏈接 `i18n/README.ru.md`，但本快照中該檔案不存在。
 
 ## 🩺 疑難排解
 
 - `AssertionError: Image does not exist`
   - 確認 `-I/--img-path` 指向有效檔案。
 - `Dataset file not found. Downloading...`
-  - 當 `data/processed/dataset.pkl` 缺失時，`MiniFlickrDataset` 會拋出此訊息；請先執行 `python dataset_generation.py`。
+  - 當缺少 `data/processed/dataset.pkl` 時，`MiniFlickrDataset` 會拋出此訊息；請先執行 `python dataset_generation.py`。
 - `Path to the test image folder does not exist`
   - 確認 `evaluate.py -I` 指向現有資料夾。
-- 首次執行過慢或失敗
-  - 初次執行會下載 Hugging Face 模型，也可能從 Google Drive 下載 checkpoint。
-- `video2caption.py` 回傳空白描述
-  - 請檢查硬編碼腳本路徑與 Python 執行檔路徑，或改用 `v2c.py`。
-- 訓練時 `wandb` 要求登入
-  - 執行 `wandb login`，或視需求在 `training.py` 手動關閉記錄。
+- 首次執行緩慢或失敗
+  - 首次執行會下載 Hugging Face 模型，並可能從 Google Drive 下載 checkpoint。
+- `video2caption.py` 回傳空白字幕
+  - 請檢查硬編碼腳本路徑與 Python 可執行檔，或改用 `v2c.py`。
+- `wandb` 提示訓練時登入
+  - 執行 `wandb login`，或視需求在 `training.py` 中手動停用紀錄。
 
-## 🛣️ 路線圖
+## 🛣️ 里程碑
 
-- 新增依賴 lockfile（`requirements.txt` 或 `pyproject.toml`）以便可重現安裝。
-- 將重複的影片流程整合為單一維護實作。
+- 新增依賴鎖定檔（`requirements.txt` 或 `pyproject.toml`）以提升可重現性。
+- 將重複的影片流程整併為單一路徑維護。
 - 移除舊版腳本中的機器硬編碼路徑。
-- 修正 `training.py` 與 `model/trainer.py` 已知的訓練/評估邊界案例錯誤。
+- 修正 `training.py` 與 `model/trainer.py` 已知的訓練／評估邊界案例錯誤。
 - 新增自動化測試與 CI。
-- 補齊 `i18n/` 中語言列所引用的 README 翻譯檔。
+- 補齊語言列中引用到的 `i18n/` README 翻譯檔。
 
 ## 🤝 貢獻
 
-歡迎貢獻。建議流程：
+歡迎提交貢獻。建議流程如下：
 
 ```bash
 # 1) Fork and clone
@@ -408,20 +426,20 @@ git commit -m "feat: describe your change"
 git push origin feat/your-change
 ```
 
-若你變更了模型行為，請附上：
+如果你變更模型行為，請一併提供：
 
 - 可重現的指令。
-- 變更前/後的範例輸出。
-- 關於 checkpoint 或資料集假設的說明。
+- 變更前後的輸出範例。
+- Checkpoint 與資料集假設備註。
 
-## 🙌 支援
+## ❤️ Support
 
-目前儲存庫快照未包含明確的捐助/贊助設定。
-
-若日後新增贊助連結，應保留於本節。
+| Donate | PayPal | Stripe |
+|---|---|---|
+| [![Donate](https://img.shields.io/badge/Donate-LazyingArt-0EA5E9?style=for-the-badge&logo=ko-fi&logoColor=white)](https://chat.lazying.art/donate) | [![PayPal](https://img.shields.io/badge/PayPal-RongzhouChen-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/RongzhouChen) | [![Stripe](https://img.shields.io/badge/Stripe-Donate-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/aFadR8gIaflgfQV6T4fw400) |
 
 ## 📄 授權
 
-目前儲存庫快照未包含授權檔案。
+本儲存庫快照目前未提供授權檔。
 
-假設說明：在新增 `LICENSE` 檔之前，重用/散佈條款均未定義。
+假設說明：在加入 `LICENSE` 檔前，重製與散佈條款仍未定義。
